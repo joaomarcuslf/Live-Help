@@ -27,7 +27,7 @@ def gcc_console(file_name)
     system("ruby #{file_name}")
   elsif file_name.include? ".c"
     aval = system("gcc #{file_name}")
-    system("./a.out") if aval == true
+    system("./a.out && rm a.out") if aval == true
   elsif file_name.include? ".py"
     system("python #{file_name}")
   else
