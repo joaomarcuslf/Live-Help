@@ -12,7 +12,7 @@ def git_console()
       puts "[msg]"
       print "git commit -m "
       action = gets.chomp
-      system("git \"#{action}\"")
+      system("git commit -m \"#{action}\"")
     elsif action == "out"
       break
     else
