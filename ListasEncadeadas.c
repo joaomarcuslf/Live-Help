@@ -43,8 +43,16 @@ aluno * lista = NULL;
 
 int main() {
   void iniciar_head(); // Completa
-  void inserir_aluno(); // Imcompleta
+  void inserir_aluno(); // Completa
+  void deletar_aluno(); // Imcompleta
   void mostrar_todos(); // Imcompleta
+
+  //Inclua essas funcoes abaixo
+  /*
+  Buscar na lista um aluno especifico, fazendo uso dos Direcionais
+  Inserir materia utilizando a mesma sequencia do aluno, porem mais simples, ja que tem apenas uma direcao
+  Deletar materia, fazendo a mesma sequencia da que foi feita para aluno
+  */
 
   iniciar_head();
 
@@ -53,6 +61,7 @@ int main() {
   while(true) {
     printf("\nDiga o que deseja fazer:");
     printf("\n  1 - Inserir Aluno");
+    printf("\n  2 - Deletar Aluno");
     printf("\n  5 - Mostrar todos");
     printf("\n  0 - Sair");
     printf("\n>>");
@@ -60,6 +69,9 @@ int main() {
 
     if(choice == 1) {
       inserir_aluno();
+    }
+    else if(choice == 2) {
+      deletar_aluno();
     }
     else if(choice == 5) {
       mostrar_todos();
@@ -130,24 +142,65 @@ void inserir_aluno() {
     lista = aux;
   }
   else {
-    aux = lista;
+    aux = cabeca->anterior;
 
     criador = malloc(sizeof(aluno));
     strcpy(criador->nome, name);
+
+    while(aux!=cabeca) {
+      //Teste de matricula
+      //Checando se ha matriculas iguais
+      if(aux->matricula == mat) {
+        printf("\nMatricula ja existente\nDiga uma nova:");
+        scanf("%i", &mat);
+        mat = 151047000 + (mat%1000);
+        aux = cabeca->anterior;
+      }
+      else {
+        aux=aux->anterior;
+      }
+    }
+
     criador->matricula = mat;
 
-    while(aux->proximo != cabeca) {
-      aux = aux->proximo;
+    aux = cabeca->anterior;
+
+    while(criador->matricula < aux->matricula && aux != cabeca ) {
+      aux = aux->anterior;
       /*
-       Auxiliar ira percorrer a lista ate chegar o ultimo elemento, que é o elemento
-      que retornaria para o cabeca
+       Fazendo uso do direcional para o anterior, podemos percorrer a lista de tras para frente
+       facilitando a ordenacao, ja que podemos comparar desde a maior matricula para a menor e
+       fazendo o uso dos recursos disponiveis
+
+
+       OBS: Isso e um exemplo de busca
       */
     }
 
-    aux->proximo = criador; // Aux -> criador
-    criador->anterior = aux; // Aux <- criador
-    criador->proximo = cabeca; // Criador -> cabeca
-    cabeca->anterior = criador; // Criador <- cabeca
+    if(aux == cabeca) {
+      // Sinal de que a matricula do criador é a menor de todas
+      // Então podemos usar os diretos lista e cabeca
+      lista->anterior = criador;
+      cabeca->proximo = criador;
+      criador->proximo = lista;
+      criador->anterior = cabeca;
+      cabeca->menorMatricula = criador->matricula;
+      lista=lista->anterior;
+    }
+    else {
+      //Podendo ser o meio da lista ou ate mesmo o fim da mesma
+      seguraLista = aux->proximo;
+      aux->proximo = criador;
+      seguraLista->anterior = criador;
+      criador->proximo = seguraLista; // Criador -> cabeca
+      seguraLista->anterior = criador; // Criador <- cabeca
+      if(criador->matricula > cabeca->maiorMatricula) {
+        cabeca->maiorMatricula = criador->matricula;
+        /*
+        Se for o ultimo, estamos ajustando a matricula
+        */
+      }
+    }
     criador->turma = NULL;
     cabeca->quantidade += 1;
   }
@@ -170,4 +223,42 @@ void mostrar_todos() {
   else {
     printf("\nA lista esta vazia!");
   }
+}
+void deletar_aluno() {
+  unsigned int mat;
+  aluno * aux = NULL, * seguraLista, * escolhido;
+  printf("\nDiga os dois ultimos numeros da Matricula: ");
+  scanf("%i", &mat);
+  mat = 151047000 + (mat%1000);
+  escolhido = lista;
+
+  while(escolhido->matricula != mat && escolhido!=cabeca) {
+    escolhido=escolhido->proximo;
+
+    // OBS: isso e um exemplo de busca
+  }
+
+  aux = escolhido->anterior;
+  seguraLista = escolhido->proximo;
+
+  if(aux == seguraLista) {
+    // Quer dizer que esse era o unico integrante da lista
+    iniciar_head();
+    lista = NULL;
+    return;
+  }
+
+  if(lista == escolhido) {
+    lista=lista->proximo;
+    //Se o escolhido for o primeiro da lista
+  }
+  aux->proximo=seguraLista;
+  seguraLista->anterior=aux;
+
+  escolhido->proximo=NULL;
+  escolhido->anterior=NULL;
+
+  free(escolhido);
+  escolhido=NULL;
+  cabeca->quantidade-=1;
 }
